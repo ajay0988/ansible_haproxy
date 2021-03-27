@@ -1,0 +1,6 @@
+[Loadbalancer]
+192.168.43.158  ansible_ssh_user=root ansible_ssh_pass=ajay1
+[webserver]
+192.168.43.155 ansible_ssh_user=root ansible_ssh_pass=ajay1
+192.168.43.44  ansible_ssh_user=root ansible_ssh_pass=ajay1
+

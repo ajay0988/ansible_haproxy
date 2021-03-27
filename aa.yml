@@ -1,0 +1,58 @@
+- name: "configure the frontend for loadbalance"
+  hosts: Loadbalancer
+  vars_prompt:
+   - name: lb_port
+     prompt: "please tell , at which port number  you want to run loadbalace program"
+     private: no
+   - name: web_port
+     prompt: "At which port number your backend server running"
+     private: no
+  vars:
+       conf_file: /etc/haproxy/haproxy.cfg
+       haproxy_sw: haproxy
+       
+       
+  
+  tasks:
+    - name: "Installing haproxy s/w for configure loadbalacing"
+      package: 
+       name: "{{ haproxy_sw }}"
+       state: present
+    - name: "copying the conf file of haproxy"
+      template:
+       src: "haproxy.cfg"
+       dest: "{{ conf_file }}"
+    - name: "start the haproxy service"
+      service: 
+       name: "{{ haproxy_sw }}"
+       state: "started"
+      register: x
+    - debug:
+       var: x["changed"]
+    - name: "get the url of loadbalancer"
+      debug: 
+        msg: "url is {{ groups['Loadbalancer'][0] }}:{{ lb_port }}"
+
+- name: "configure the backend webserver"
+  hosts: webserver
+  vars:
+   httpd_sw: httpd
+
+  tasks:
+    - name: "Installing httpd s/w at backend server"
+      package: 
+       name: "{{ httpd_sw }}"
+       state: present
+    - name: "copy the webpage"
+      copy: 
+       content: "This is webserver {{ ansible_hostname }}"
+       dest: /var/www/html/index.html
+    - name: "start the backend servers"
+      service:
+       name: "{{ httpd_sw }}"
+       state: started
+    
+
+
+       
+
